@@ -188,14 +188,12 @@
     font-size: 0.9em;
   }
 
-  /* ── Focus ring ── */
   :focus-visible {
     outline: 2px solid var(--accent-fg);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
 
-  /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
