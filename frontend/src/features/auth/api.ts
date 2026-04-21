@@ -1,13 +1,20 @@
 import { api } from "@core/api";
-
-interface AuthResponse {
-  success: 0 | 1;
-  access_token: string;
-}
+import { authResponseSchema, AuthResponse } from "shared/schemas/auth.schema";
 
 export const authApi = {
-  authenticate: (base64Payload: string) =>
-    api
-    .post<AuthResponse>("/auth/login", { payload: base64Payload })
-    .then((r) => r.data),
+  login: async (file: File, text: string, hiddenText: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("text", text);
+    formData.append("hiddenText", hiddenText);
+
+    const res = await api.post<AuthResponse>("/auth/login", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    const parsed = authResponseSchema.safeParse(res.data);
+    if (!parsed.success) throw new Error("Unexpected response from server");
+
+    return parsed.data;
+  },
 };

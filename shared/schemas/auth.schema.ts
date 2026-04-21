@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 export const authRequestSchema = z.object({
-  data: z.string().min(1, "Payload cannot be empty"),
+  text: z.string().min(1, "Identifier is required"),
+  hiddenText: z.string().min(1, "Secret key is required"),
 });
 
 export const authResponseSchema = z.object({
