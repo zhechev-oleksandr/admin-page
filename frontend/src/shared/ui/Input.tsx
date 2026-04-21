@@ -37,9 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ].join(" ")}
         />
 
-        {error && (
-          <span className="text-[0.8125rem] text-danger-fg">{error}</span>
-        )}
+        {error && <span className="text-[0.8125rem] text-danger-fg">{error}</span>}
       </div>
     );
   }

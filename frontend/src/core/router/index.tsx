@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthPage, MainPage } from '@/pages';
-import { ProtectedRoute } from './ProtectedRoute';
-import { PublicRoute } from './PublicRoute';
+import { AuthPage, MainPage } from "@/pages";
+import { ProtectedRoute } from "./ProtectedRoute";
+import { PublicRoute } from "./PublicRoute";
 
-export const AppRouter = ()=> {
+export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
@@ -16,8 +16,7 @@ export const AppRouter = ()=> {
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
-
       </Routes>
     </BrowserRouter>
   );
-}
+};

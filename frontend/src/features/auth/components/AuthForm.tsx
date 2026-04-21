@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useAuth } from "@features/auth";
-import { Button, FileDropzone, Input } from '@shared/ui';
+import { Button, FileDropzone, Input } from "@shared/ui";
 
-export const AuthForm = ()=> {
+export const AuthForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
   const [hiddenText, setHiddenText] = useState("");
@@ -19,11 +19,7 @@ export const AuthForm = ()=> {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <FileDropzone
-        label="Ключовий файл"
-        value={file}
-        onChange={setFile}
-      />
+      <FileDropzone label="Ключовий файл" value={file} onChange={setFile} />
 
       <Input
         label="Ідентифікатор"
@@ -51,14 +47,9 @@ export const AuthForm = ()=> {
         </div>
       )}
 
-      <Button
-        type="submit"
-        loading={isPending}
-        disabled={!file}
-        className="w-full mt-1"
-      >
+      <Button type="submit" loading={isPending} disabled={!file} className="w-full mt-1">
         {isPending ? "Обробка…" : "Вхід"}
       </Button>
     </form>
   );
-}
+};

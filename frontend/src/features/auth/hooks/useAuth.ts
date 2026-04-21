@@ -12,10 +12,9 @@ export const useAuth = () => {
   const setToken = useAuthStore((s) => s.setAccessToken);
 
   return useMutation({
-    mutationFn: ({ file, text, hiddenText }: AuthInput) =>
-      authApi.login(file, text, hiddenText),
+    mutationFn: ({ file, text, hiddenText }: AuthInput) => authApi.login(file, text, hiddenText),
     onSuccess: (data) => {
       if (data.success === 1) setToken(data.access_token);
     },
   });
-}
+};

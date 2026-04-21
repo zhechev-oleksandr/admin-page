@@ -1,5 +1,5 @@
 import { useRef, useState, type DragEvent, type ChangeEvent } from "react";
-import { FileIcon, UploadIcon } from '@shared/ui/icons';
+import { FileIcon, UploadIcon } from "@shared/ui/icons";
 
 interface FileDropzoneProps {
   label?: string;
@@ -27,9 +27,7 @@ export const FileDropzone = ({ label, accept, value, onChange, error }: FileDrop
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-[0.8125rem] font-medium text-fg-muted tracking-wide">
-          {label}
-        </label>
+        <label className="text-[0.8125rem] font-medium text-fg-muted tracking-wide">{label}</label>
       )}
 
       <div
@@ -38,7 +36,10 @@ export const FileDropzone = ({ label, accept, value, onChange, error }: FileDrop
         aria-label={label ?? "Upload file"}
         onClick={() => inputRef.current?.click()}
         onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         className={[
@@ -63,12 +64,13 @@ export const FileDropzone = ({ label, accept, value, onChange, error }: FileDrop
         {value ? (
           <div className="flex items-center gap-2.5 w-full">
             <FileIcon />
-            <span className="flex-1 text-sm font-medium text-fg-base truncate">
-              {value.name}
-            </span>
+            <span className="flex-1 text-sm font-medium text-fg-base truncate">{value.name}</span>
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onChange(null); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(null);
+              }}
               className="shrink-0 text-fg-subtle hover:text-fg-muted text-sm px-1 py-0.5 rounded bg-transparent border-none cursor-pointer transition-colors"
               aria-label="Remove file"
             >
@@ -79,17 +81,13 @@ export const FileDropzone = ({ label, accept, value, onChange, error }: FileDrop
           <div className="text-center">
             <UploadIcon />
             <p className="text-sm text-fg-muted mt-1.5">
-              Drop a file here or{" "}
-              <span className="text-accent-fg font-medium">browse</span>
+              Drop a file here or <span className="text-accent-fg font-medium">browse</span>
             </p>
           </div>
         )}
       </div>
 
-      {error && (
-        <span className="text-[0.8125rem] text-danger-fg">{error}</span>
-      )}
+      {error && <span className="text-[0.8125rem] text-danger-fg">{error}</span>}
     </div>
   );
-}
-
+};

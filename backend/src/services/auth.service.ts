@@ -8,22 +8,14 @@ interface AuthResult {
 }
 
 export const authService = {
-  login: async (
-    fileBuffer: Buffer,
-    text: string,
-    hiddenText: string
-  ): Promise<AuthResult> => {
+  login: async (fileBuffer: Buffer, text: string, hiddenText: string): Promise<AuthResult> => {
     const base64Payload = processCredentials(fileBuffer, text, hiddenText);
 
     if (!base64Payload.trim()) {
       return { success: 0, access_token: "" };
     }
 
-    const token = jwt.sign(
-      { payload: base64Payload },
-      env.JWT_SECRET,
-      { expiresIn: "8h" }
-    );
+    const token = jwt.sign({ payload: base64Payload }, env.JWT_SECRET, { expiresIn: "8h" });
 
     return { success: 1, access_token: token };
   },

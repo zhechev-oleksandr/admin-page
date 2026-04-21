@@ -12,12 +12,12 @@ app.use(
   cors(
     isProd
       ? {
-        origin: process.env.CLIENT_URL ?? "http://localhost:5173",
-        credentials: true,
-      }
+          origin: process.env.CLIENT_URL ?? "http://localhost:5173",
+          credentials: true,
+        }
       : {
-        origin: '*',
-      }
+          origin: "*",
+        }
   )
 );
 app.use("/api/auth", authRouter);

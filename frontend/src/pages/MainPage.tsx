@@ -1,3 +1,1 @@
-export const MainPage = () => (
-  <></>
-)
+export const MainPage = () => <></>;

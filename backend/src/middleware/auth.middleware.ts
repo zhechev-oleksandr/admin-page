@@ -1,16 +1,12 @@
-import type { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { env } from '../config/env';
+import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env";
 
 export interface AuthRequest extends Request {
   user?: jwt.JwtPayload;
 }
 
-export function requireAuth(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) {
+export function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
