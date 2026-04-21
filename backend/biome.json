@@ -10,17 +10,34 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineWidth": 100,
+		"bracketSpacing": true,
+		"formatWithErrors": true
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": "warn",
+				"noUnusedImports": "warn"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn"
+			},
+			"style": {
+				"noNonNullAssertion": "warn"
+			}
 		}
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"trailingCommas": "es5",
+			"semicolons": "always",
+			"arrowParentheses": "always"
 		}
 	},
 	"assist": {
