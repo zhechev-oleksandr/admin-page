@@ -1,32 +1,47 @@
-import type { Response, NextFunction } from "express";
-import type { AuthRequest } from "../middleware/auth.middleware";
+import type { RequestHandler } from "express";
 import { authService } from "../services/auth.service";
 import { authRequestSchema } from "shared/schemas/auth.schema";
+import { env } from "../config/env";
 
-export async function login(req: AuthRequest, res: Response, next: NextFunction) {
+const COOKIE_NAME = "access_token";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  maxAge: 1000 * 60 * 60 * 8,
+};
+
+export const login: RequestHandler = async (req, res, next) => {
   try {
-    const file = req.file;
-
-    if (!file) {
-      return res
-        .status(400)
-        .json({ success: 0, access_token: "", message: "Key file is required" });
-    }
-
     const parsed = authRequestSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      return res.status(400).json({
+      return void res.status(400).json({
         success: 0,
-        access_token: "",
         errors: parsed.error.flatten(),
       });
     }
 
-    const result = await authService.login(file.buffer, parsed.data.text, parsed.data.hiddenText);
+    const result = await authService.login(parsed.data.signature, parsed.data.identifier);
 
-    return res.status(result.success ? 200 : 401).json(result);
+    if (result.success === 1 && result._token) {
+      res.cookie(COOKIE_NAME, result._token, cookieOptions);
+    }
+
+    return void res.status(result.success ? 200 : 401).json({
+      success: result.success,
+    });
   } catch (err) {
     next(err);
   }
-}
+};
+
+export const logout: RequestHandler = (_req, res) => {
+  res.clearCookie(COOKIE_NAME, cookieOptions);
+  return void res.json({ success: 1 });
+};
+
+export const me: RequestHandler = (_req, res) => {
+  return void res.json({ authenticated: true });
+};
