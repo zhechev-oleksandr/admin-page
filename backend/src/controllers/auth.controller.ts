@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import { authService } from "../services/auth.service";
 import { authRequestSchema } from "shared/schemas/auth.schema";
 import { env } from "../config/env";
+import jwt from 'jsonwebtoken';
 
 const COOKIE_NAME = "access_token";
 
@@ -42,6 +43,17 @@ export const logout: RequestHandler = (_req, res) => {
   return void res.json({ success: 1 });
 };
 
-export const me: RequestHandler = (_req, res) => {
-  return void res.json({ authenticated: true });
+export const me: RequestHandler = (req, res) => {
+  const token = req.cookies?.access_token;
+
+  if (!token) {
+    return void res.status(200).json({ authenticated: false });
+  }
+
+  try {
+    jwt.verify(token, env.JWT_SECRET);
+    return void res.status(200).json({ authenticated: true });
+  } catch {
+    return void res.status(200).json({ authenticated: false });
+  }
 };

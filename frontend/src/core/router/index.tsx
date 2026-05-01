@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthPage, MainPage } from "@/pages";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicRoute } from "./PublicRoute";
-import {} from "@features/auth/api";
 import { useEffect, useState } from "react";
 import { useAuthStore, authApi } from "@features/auth";
 
@@ -11,11 +10,9 @@ export const AppRouter = () => {
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
 
   useEffect(() => {
-    authApi
-      .me()
-      .then(() => setAuthenticated(true))
-      .catch(() => setAuthenticated(false))
-      .finally(() => setChecking(false));
+    authApi.me()
+    .then((isAuth) => setAuthenticated(isAuth))
+    .finally(() => setChecking(false));
   }, [setAuthenticated]);
 
   if (checking) {

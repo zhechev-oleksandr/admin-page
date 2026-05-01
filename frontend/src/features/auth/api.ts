@@ -10,8 +10,8 @@ export const authApi = {
   },
 
   logout: () => api.post("/auth/logout"),
-  me: () =>
-    api.get<{ authenticated: boolean }>("/auth/me", {
-      headers: { "x-skip-auth-redirect": "true" },
-    }),
+  me: async () => {
+    const res = await api.get<{ authenticated: boolean }>("/auth/me");
+    return res.data.authenticated;
+  },
 };

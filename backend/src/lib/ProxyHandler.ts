@@ -69,6 +69,18 @@ const KNOWN_HOSTS = new Set<string>([
   "ca.iit.com.ua",
 ]);
 
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 16,
+  timeout: 5_000,
+});
+
+const httpAgent = new http.Agent({
+  keepAlive: true,
+  maxSockets: 16,
+  timeout: 5_000,
+});
+
 function isKnownHost(rawUrl: string): boolean {
   if (rawUrl.length > URL_MAX_LENGTH || !URL_REGEX.test(rawUrl)) {
     return false;
@@ -158,9 +170,12 @@ async function proxyRequest(
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const { protocol, hostname, port, pathname, search } = new URL(address);
-    const connector = protocol === "http:" ? http : https;
+    const isHttps   = protocol === "https:";
+    const connector = isHttps ? https : http;
+    const agent     = isHttps ? httpsAgent : httpAgent;
 
     const options: http.RequestOptions = {
+      agent,
       hostname,
       port: port || undefined,
       path: pathname + (search ?? ""),
@@ -180,6 +195,11 @@ async function proxyRequest(
       res.on("data", (chunk: Buffer) => chunks.push(chunk));
       res.on("end", () => resolve(Buffer.concat(chunks)));
       res.on("error", reject);
+    });
+
+    req.setTimeout(5_000, () => {
+      req.destroy();
+      reject(new HttpError(504));
     });
 
     req.on("error", (err) => {

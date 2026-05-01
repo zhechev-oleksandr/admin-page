@@ -10,13 +10,9 @@ export const api = axios.create({
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    const is401 = err.response?.status === 401;
-    const skipRedirect = err.config?.headers?.["x-skip-auth-redirect"] === "true";
-
-    if (is401 && !skipRedirect) {
+    if (err.response?.status === 401) {
       useAuthStore.getState().logout();
     }
-
     return Promise.reject(err);
   }
 );
