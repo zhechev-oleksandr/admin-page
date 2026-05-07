@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { authService } from "../services/auth.service";
 import { authRequestSchema } from "shared/schemas/auth.schema";
 import { env } from "../config/env";
+import { extractSignerInfo } from "../lib/extractSignerInfo";
 
 const COOKIE_NAME = "access_token";
 
@@ -23,12 +24,13 @@ export const login: RequestHandler = async (req, res, next) => {
         errors: parsed.error.flatten(),
       });
     }
+    const { drfoCode, fullName } = extractSignerInfo(parsed.data.signature);
 
     const result = await authService.login(
       parsed.data.signature,
       parsed.data.identifier,
-      parsed.data.fullName,
-      parsed.data.drfoCode
+      fullName,
+      drfoCode
     );
 
     if (result.success === 1 && result._token) {

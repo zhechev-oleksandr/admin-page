@@ -13,8 +13,8 @@ export const AppRouter = () => {
     authApi
       .me()
       .then(({ authenticated, drfoCode, name }) => {
-        setAuthenticated(authenticated);
         setUser(name, drfoCode);
+        return setAuthenticated(authenticated);
       })
       .finally(() => setChecking(false));
   }, [setAuthenticated]);

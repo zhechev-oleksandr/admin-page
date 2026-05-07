@@ -1,6 +1,5 @@
-import { AuthForm } from "@features/auth";
+import { AuthForm, useEUSign } from "@features/auth";
 import { Spinner } from "@shared/ui";
-import { useEUSign } from "@features/auth/hooks";
 
 export const AuthPage = () => {
   const { status: libStatus, error: libError, signData } = useEUSign();

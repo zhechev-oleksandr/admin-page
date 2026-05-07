@@ -2,14 +2,13 @@ import { useState } from "react";
 import { Input, FileDropzone, Button, Spinner } from "@shared/ui";
 import { useAuth } from "../hooks";
 import { generateIdentifier } from "../lib/generateIdentifier";
-import { SignResult } from "@features/auth/hooks/useEUSign";
 
 const IDENTIFIER = generateIdentifier();
 
 interface AuthForm {
   libStatus: "idle" | "loading" | "ready" | "error";
   libError: string | null;
-  signData: (keyFile: File, password: string, identifier: string) => Promise<SignResult>;
+  signData: (keyFile: File, password: string, identifier: string) => Promise<string>;
 }
 
 export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
@@ -38,9 +37,9 @@ export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
 
     try {
       setIsSigning(true);
-      const { signature, fullName, drfoCode } = await signData(file, password, IDENTIFIER);
+      const signature = await signData(file, password, IDENTIFIER);
       setIsSigning(false);
-      mutate({ signature, identifier: IDENTIFIER, fullName, drfoCode });
+      mutate({ signature, identifier: IDENTIFIER });
     } catch (err) {
       setIsSigning(false);
       setErrors((prev) => ({
