@@ -9,6 +9,7 @@ export interface AuthInput {
 }
 
 export const useAuth = () => {
+  const setUser = useAuthStore((s) => s.setUser);
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
   const navigate = useNavigate();
 
@@ -16,6 +17,7 @@ export const useAuth = () => {
     mutationFn: ({ signature, identifier }: AuthInput) => authApi.login(signature, identifier),
     onSuccess: (data) => {
       if (data.success === 1) {
+        setUser(data.fullName, data.drfoCode)
         setAuthenticated(true);
         navigate("/");
       }

@@ -7,6 +7,8 @@ export const authRequestSchema = z.object({
 
 export const authResponseSchema = z.object({
   success: z.union([z.literal(0), z.literal(1)]),
+  fullName: z.string(),
+  drfoCode: z.string(),
 });
 
 export type AuthRequest = z.infer<typeof authRequestSchema>;

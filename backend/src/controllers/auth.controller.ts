@@ -39,6 +39,8 @@ export const login: RequestHandler = async (req, res, next) => {
 
     return void res.status(result.success ? 200 : 401).json({
       success: result.success,
+      fullName,
+      drfoCode,
     });
   } catch (err) {
     next(err);
