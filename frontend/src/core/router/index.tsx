@@ -8,11 +8,15 @@ import { useAuthStore, authApi } from "@features/auth";
 export const AppRouter = () => {
   const [checking, setChecking] = useState(true);
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
-
+  const setUser = useAuthStore((s) => s.setUser);
   useEffect(() => {
-    authApi.me()
-    .then((isAuth) => setAuthenticated(isAuth))
-    .finally(() => setChecking(false));
+    authApi
+      .me()
+      .then(({ authenticated, drfoCode, name }) => {
+        setAuthenticated(authenticated);
+        setUser(name, drfoCode);
+      })
+      .finally(() => setChecking(false));
   }, [setAuthenticated]);
 
   if (checking) {

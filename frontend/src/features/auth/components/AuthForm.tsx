@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Input, FileDropzone, Button, Spinner } from "@shared/ui";
-import { useAuth, useEUSign } from "../hooks";
+import { useAuth } from "../hooks";
 import { generateIdentifier } from "../lib/generateIdentifier";
+import { SignResult } from "@features/auth/hooks/useEUSign";
 
 const IDENTIFIER = generateIdentifier();
 
 interface AuthForm {
   libStatus: "idle" | "loading" | "ready" | "error";
   libError: string | null;
-  signData: (keyFile: File, password: string, identifier: string) => Promise<string>;
+  signData: (keyFile: File, password: string, identifier: string) => Promise<SignResult>;
 }
 
 export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
@@ -16,28 +17,30 @@ export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ file?: string; password?: string }>({});
   const [isSigning, setIsSigning] = useState(false);
+
   const { mutate, isPending, error: authError, data } = useAuth();
-
   const hasAuthError = data?.success === 0;
-  const signingLabel = isSigning ? "Підписування…" : isPending ? "Перевірка…" : "Увійти";
+  const isLoading = isSigning || isPending;
 
-  const validate = () => {
+  const buttonLabel = isSigning ? "Підписування…" : isPending ? "Перевірка…" : "Увійти";
+
+  function validate(): boolean {
     const next: typeof errors = {};
     if (!file) next.file = "Оберіть файл ключа";
     if (!password.trim()) next.password = "Введіть пароль ключа";
     setErrors(next);
     return Object.keys(next).length === 0;
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate() || !file) return;
 
     try {
       setIsSigning(true);
-      const signature = await signData(file, password, IDENTIFIER);
+      const { signature, fullName, drfoCode } = await signData(file, password, IDENTIFIER);
       setIsSigning(false);
-      mutate({ signature, identifier: IDENTIFIER });
+      mutate({ signature, identifier: IDENTIFIER, fullName, drfoCode });
     } catch (err) {
       setIsSigning(false);
       setErrors((prev) => ({
@@ -45,7 +48,7 @@ export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
         password: err instanceof Error ? err.message : "Помилка підпису",
       }));
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -54,8 +57,9 @@ export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
           {libError ?? "Не вдалося ініціалізувати бібліотеку підпису."}
         </div>
       )}
+
       <FileDropzone
-        label="Файл ключа (.p12,.jks,.pfx,.pk8,.zs2,.dat)"
+        label="Файл ключа (.p12, .jks, .pfx, .zs2)"
         accept=".p12,.jks,.pfx,.pk8,.zs2,.dat"
         value={file}
         onChange={(f) => {
@@ -89,17 +93,17 @@ export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
       {isSigning && (
         <div className="px-4 py-3 rounded-lg text-sm text-fg-muted bg-bg-subtle border border-border-base flex items-center gap-2">
           <Spinner />
-          Перевірка підпису…
+          Зверніться до серверів ЦСК для перевірки підпису…
         </div>
       )}
 
       <Button
         type="submit"
-        loading={isPending}
-        disabled={!file || libStatus !== "ready"}
+        loading={isLoading}
+        disabled={!file || libStatus !== "ready" || isLoading}
         className="w-full mt-1"
       >
-        {signingLabel}
+        {buttonLabel}
       </Button>
     </form>
   );

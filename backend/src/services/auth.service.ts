@@ -1,22 +1,14 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 
-interface AuthResult {
-  success: 0 | 1;
-}
-
 export const authService = {
-  /* TODO: provide a real implementation. */
-  login: async (
-    signature: string,
-    identifier: string
-  ): Promise<AuthResult & { _token?: string }> => {
+  login: async (signature: string, identifier: string, fullName: string, drfoCode: string) => {
     if (!signature.trim() || !identifier.trim()) {
-      return { success: 0 };
+      return { success: 0 as const, _token: null };
     }
 
-    const token = jwt.sign({ identifier }, env.JWT_SECRET, { expiresIn: "8h" });
+    const token = jwt.sign({ identifier, fullName, drfoCode }, env.JWT_SECRET, { expiresIn: "8h" });
 
-    return { success: 1, _token: token };
+    return { success: 1 as const, _token: token };
   },
 };

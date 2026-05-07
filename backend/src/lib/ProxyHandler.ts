@@ -22,26 +22,17 @@ const KNOWN_HOSTS = new Set<string>([
   "ca.informjust.ua",
   "csk.uz.gov.ua",
   "masterkey.ua",
-  "ocsp.masterkey.ua",
-  "tsp.masterkey.ua",
   "csk.uss.gov.ua",
   "csk.ukrsibbank.com",
   "acsk.privatbank.ua",
   "ca.mil.gov.ua",
-  "acsk.dpsu.gov.ua",
-  "acsk.er.gov.ua",
   "ca.mvs.gov.ua",
   "canbu.bank.gov.ua",
   "uakey.com.ua",
   "altersign.com.ua",
-  "ca.altersign.com.ua",
-  "ocsp.altersign.com.ua",
-  "acsk.treasury.gov.ua",
-  "ocsp.treasury.gov.ua",
   "ca.oschadbank.ua",
   "ca.gp.gov.ua",
   "acsk.oree.com.ua",
-  "ca.treasury.gov.ua",
   "ca.depositsign.com",
   "pki.pumb.ua",
   "cesaris.itsway.kiev.ua",
@@ -57,10 +48,7 @@ const KNOWN_HOSTS = new Set<string>([
   "ca.tax.gov.ua",
   "ca.diia.gov.ua",
   "ca.sensebank.com.ua",
-  "ca.tascombank.com.ua",
   "ca.tascombank.ua",
-  "ca.szru.gov.ua",
-  "va1-knedp.ssu.gov.ua",
   "amokey.com.ua",
   "ca.monobank.ua",
   "ca.ngu.gov.ua",
@@ -68,6 +56,21 @@ const KNOWN_HOSTS = new Set<string>([
   "ca-test.czo.gov.ua",
   "ca.iit.com.ua",
 ]);
+
+const UNREACHABLE_HOSTS = [
+  "ocsp.masterkey.ua",
+  "tsp.masterkey.ua",
+  "acsk.dpsu.gov.ua",
+  "acsk.er.gov.ua",
+  "ca.altersign.com.ua",
+  "ocsp.altersign.com.ua",
+  "acsk.treasury.gov.ua",
+  "ocsp.treasury.gov.ua",
+  "ca.treasury.gov.ua",
+  "ca.tascombank.com.ua",
+  "ca.szru.gov.ua",
+  "va1-knedp.ssu.gov.ua",
+];
 
 const httpsAgent = new https.Agent({
   keepAlive: true,
@@ -170,9 +173,9 @@ async function proxyRequest(
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const { protocol, hostname, port, pathname, search } = new URL(address);
-    const isHttps   = protocol === "https:";
+    const isHttps = protocol === "https:";
     const connector = isHttps ? https : http;
-    const agent     = isHttps ? httpsAgent : httpAgent;
+    const agent = isHttps ? httpsAgent : httpAgent;
 
     const options: http.RequestOptions = {
       agent,

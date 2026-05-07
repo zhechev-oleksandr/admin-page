@@ -1,8 +1,8 @@
 import type { RequestHandler } from "express";
+import jwt from "jsonwebtoken";
 import { authService } from "../services/auth.service";
 import { authRequestSchema } from "shared/schemas/auth.schema";
 import { env } from "../config/env";
-import jwt from 'jsonwebtoken';
 
 const COOKIE_NAME = "access_token";
 
@@ -24,7 +24,12 @@ export const login: RequestHandler = async (req, res, next) => {
       });
     }
 
-    const result = await authService.login(parsed.data.signature, parsed.data.identifier);
+    const result = await authService.login(
+      parsed.data.signature,
+      parsed.data.identifier,
+      parsed.data.fullName,
+      parsed.data.drfoCode
+    );
 
     if (result.success === 1 && result._token) {
       res.cookie(COOKIE_NAME, result._token, cookieOptions);
@@ -47,13 +52,17 @@ export const me: RequestHandler = (req, res) => {
   const token = req.cookies?.access_token;
 
   if (!token) {
-    return void res.status(200).json({ authenticated: false });
+    return void res.status(200).json({ authenticated: false, name: "", drfoCode: "" });
   }
 
   try {
-    jwt.verify(token, env.JWT_SECRET);
-    return void res.status(200).json({ authenticated: true });
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload;
+    return void res.status(200).json({
+      authenticated: true,
+      name: decoded.fullName ?? "",
+      drfoCode: decoded.drfoCode ?? "",
+    });
   } catch {
-    return void res.status(200).json({ authenticated: false });
+    return void res.status(200).json({ authenticated: false, name: "", drfoCode: "" });
   }
 };

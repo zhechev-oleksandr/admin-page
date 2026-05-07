@@ -1,13 +1,18 @@
-import { useLogout } from "@features/auth/hooks/useLogout";
+import { useLogout, useAuthStore } from "@features/auth";
 import { Button } from "@shared/ui/Button";
 
 export const MainPage = () => {
   const { mutate: logout, isPending } = useLogout();
+  const name = useAuthStore((s) => s.name);
+  const drfoCode = useAuthStore((s) => s.drfoCode);
 
   return (
     <main className="min-h-screen bg-bg-base">
       <header className="flex items-center justify-between px-8 py-4 border-b border-border-base bg-bg-surface">
-        <span className="text-sm font-semibold text-fg-base">Admin Panel</span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-semibold text-fg-base">{name || "—"}</span>
+          <span className="text-xs text-fg-subtle">РНОКПП: {drfoCode || "—"}</span>
+        </div>
         <Button variant="ghost" size="sm" loading={isPending} onClick={() => logout()}>
           Вийти
         </Button>
