@@ -17,7 +17,7 @@ export const useAuth = () => {
     mutationFn: ({ signature, identifier }: AuthInput) => authApi.login(signature, identifier),
     onSuccess: (data) => {
       if (data.success === 1) {
-        setUser(data.fullName, data.drfoCode)
+        setUser(data.fullName, data.drfoCode);
         setAuthenticated(true);
         navigate("/");
       }

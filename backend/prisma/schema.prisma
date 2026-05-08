@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  nonce       String   @unique
+  used        Boolean  @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  @@index([expiresAt])
+  @@index([nonce])
+}

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const authRequestSchema = z.object({
   signature: z.string().min(1, "Signature is required"),
-  identifier: z.string().length(32, "Identifier must be 32 characters"),
+  nonce: z.string().length(32, "Identifier must be 32 characters"),
 });
 
 export const authResponseSchema = z.object({

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Input, FileDropzone, Button, Spinner } from "@shared/ui";
 import { useAuth } from "../hooks";
-import { generateIdentifier } from "../lib/generateIdentifier";
-
-const IDENTIFIER = generateIdentifier();
+import { authApi } from "@features/auth";
 
 interface AuthForm {
   libStatus: "idle" | "loading" | "ready" | "error";
@@ -37,9 +35,10 @@ export const AuthForm = ({ libStatus, libError, signData }: AuthForm) => {
 
     try {
       setIsSigning(true);
-      const signature = await signData(file, password, IDENTIFIER);
+      const nonce = await authApi.getChallenge();
+      const signature = await signData(file, password, nonce);
       setIsSigning(false);
-      mutate({ signature, identifier: IDENTIFIER });
+      mutate({ signature, identifier: nonce });
     } catch (err) {
       setIsSigning(false);
       setErrors((prev) => ({

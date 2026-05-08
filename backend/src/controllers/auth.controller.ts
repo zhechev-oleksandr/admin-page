@@ -3,15 +3,35 @@ import jwt from "jsonwebtoken";
 import { authService } from "../services/auth.service";
 import { authRequestSchema } from "shared/schemas/auth.schema";
 import { env } from "../config/env";
+import { prisma } from "../config/db";
+import { randomBytes } from "crypto";
 import { extractSignerInfo } from "../lib/extractSignerInfo";
 
 const COOKIE_NAME = "access_token";
+const CHALLENGE_TTL_MS = 10 * 60 * 1000;
 
 const cookieOptions = {
   httpOnly: true,
   secure: env.NODE_ENV === "production",
   sameSite: "lax" as const,
   maxAge: 1000 * 60 * 60 * 8,
+};
+
+export const getChallenge: RequestHandler = async (_req, res, next) => {
+  try {
+    await prisma.challenge.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    });
+
+    const nonce = randomBytes(16).toString("hex");
+    const expiresAt = new Date(Date.now() + CHALLENGE_TTL_MS);
+
+    await prisma.challenge.create({ data: { nonce, expiresAt } });
+
+    return void res.json({ nonce });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const login: RequestHandler = async (req, res, next) => {
@@ -24,14 +44,27 @@ export const login: RequestHandler = async (req, res, next) => {
         errors: parsed.error.flatten(),
       });
     }
+    const { signature, nonce } = parsed.data;
     const { drfoCode, fullName } = extractSignerInfo(parsed.data.signature);
 
-    const result = await authService.login(
-      parsed.data.signature,
-      parsed.data.identifier,
-      fullName,
-      drfoCode
-    );
+    const challenge = await prisma.challenge.findUnique({ where: { nonce } });
+
+    if (!challenge) {
+      return void res.status(400).json({ success: 0, message: "Invalid challenge" });
+    }
+    if (challenge.used) {
+      return void res.status(400).json({ success: 0, message: "Challenge already used" });
+    }
+    if (challenge.expiresAt < new Date()) {
+      return void res.status(400).json({ success: 0, message: "Challenge expired" });
+    }
+
+    await prisma.challenge.update({
+      where: { nonce },
+      data: { used: true },
+    });
+
+    const result = await authService.login(signature, nonce, fullName, drfoCode);
 
     if (result.success === 1 && result._token) {
       res.cookie(COOKIE_NAME, result._token, cookieOptions);
