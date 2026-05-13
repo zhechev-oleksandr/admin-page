@@ -1,20 +1,26 @@
 import { useMutation } from "@tanstack/react-query";
 import { authApi } from "../api";
 import { useAuthStore } from "../store";
+import { useNavigate } from "react-router-dom";
 
 export interface AuthInput {
-  file: File;
-  text: string;
-  hiddenText: string;
+  signature: string;
+  identifier: string;
 }
 
 export const useAuth = () => {
-  const setToken = useAuthStore((s) => s.setAccessToken);
+  const setUser = useAuthStore((s) => s.setUser);
+  const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
+  const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: ({ file, text, hiddenText }: AuthInput) => authApi.login(file, text, hiddenText),
+    mutationFn: ({ signature, identifier }: AuthInput) => authApi.login(signature, identifier),
     onSuccess: (data) => {
-      if (data.success === 1) setToken(data.access_token);
+      if (data.success === 1) {
+        setUser(data.fullName, data.drfoCode);
+        setAuthenticated(true);
+        navigate("/");
+      }
     },
   });
 };

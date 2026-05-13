@@ -4,9 +4,8 @@ import { prisma } from "./config/db";
 
 async function main() {
   await prisma.$connect();
-  console.log("Connected to MongoDB");
-
-  app.listen(env.PORT, () => {
+  console.log("Connected to DB");
+  app.listen(env.PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${env.PORT}`);
   });
 }

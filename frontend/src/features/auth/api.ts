@@ -1,20 +1,28 @@
 import { api } from "@core/api";
-import { authResponseSchema, AuthResponse } from "shared/schemas/auth.schema";
+import { authResponseSchema } from "shared/schemas/auth.schema";
 
 export const authApi = {
-  login: async (file: File, text: string, hiddenText: string) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("text", text);
-    formData.append("hiddenText", hiddenText);
+  getChallenge: async (): Promise<string> => {
+    const res = await api.get<{ nonce: string }>("/auth/challenge");
+    return res.data.nonce;
+  },
 
-    const res = await api.post<AuthResponse>("/auth/login", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  login: async (signature: string, identifier: string) => {
+    const res = await api.post("/auth/login", {
+      signature,
+      nonce: identifier,
     });
-
     const parsed = authResponseSchema.safeParse(res.data);
     if (!parsed.success) throw new Error("Unexpected response from server");
-
     return parsed.data;
+  },
+
+  logout: () => api.post("/auth/logout"),
+
+  me: async (): Promise<{ authenticated: boolean; name: string; drfoCode: string }> => {
+    const res = await api.get<{ authenticated: boolean; name: string; drfoCode: string }>(
+      "/auth/me"
+    );
+    return res.data;
   },
 };

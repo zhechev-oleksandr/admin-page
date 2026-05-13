@@ -81,7 +81,8 @@ export const FileDropzone = ({ label, accept, value, onChange, error }: FileDrop
           <div className="text-center">
             <UploadIcon />
             <p className="text-sm text-fg-muted mt-1.5">
-              Drop a file here or <span className="text-accent-fg font-medium">browse</span>
+              <span className="hidden md:inline">Перетягніть сюди файл ключа </span>
+              <span className="text-accent-fg font-medium">або завантажте його зі свого носія</span>
             </p>
           </div>
         )}

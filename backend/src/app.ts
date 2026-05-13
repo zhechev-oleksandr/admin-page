@@ -1,18 +1,21 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { authRouter } from "./routes/auth.route";
+import { authRouter, proxyRouter } from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
+import { env } from "./config/env";
+import cookieParser from "cookie-parser";
+import morgan from "morgan";
 
 const app = express();
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = env.NODE_ENV === "production";
 app.use(helmet());
 app.use(
   cors(
     isProd
       ? {
-          origin: process.env.CLIENT_URL ?? "http://localhost:5173",
+          origin: env.CLIENT_URL,
           credentials: true,
         }
       : {
@@ -20,6 +23,10 @@ app.use(
         }
   )
 );
+app.use(morgan("dev"));
+app.use(express.json({ limit: "50kb" }));
+app.use(cookieParser(env.COOKIE_SECRET));
+app.use("/api/proxy", proxyRouter);
 app.use("/api/auth", authRouter);
 
 app.get("/health", (_req, res) => {

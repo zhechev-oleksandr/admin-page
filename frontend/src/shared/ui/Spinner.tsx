@@ -1,8 +1,11 @@
-export const Spinner = () => {
+interface SpinnerProps {
+  size?: number;
+}
+export const Spinner = ({ size = 20 }: SpinnerProps) => {
   return (
     <svg
-      width="15"
-      height="15"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
