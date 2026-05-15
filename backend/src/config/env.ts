@@ -15,4 +15,5 @@ export const env = {
   JWT_SECRET: process.env.JWT_SECRET ?? "changeme",
   COOKIE_SECRET: process.env.COOKIE_SECRET ?? "cookie-secret-changeme",
   CLIENT_URL: process.env.CLIENT_URL ?? "http://localhost:5173",
+  FIREBASE_TOPIC: process.env.FIREBASE_TOPIC ?? "all",
 };
